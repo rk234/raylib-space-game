@@ -5,7 +5,7 @@
 #include <stdlib.h>
 
 #define SCREEN_WIDTH (500)
-#define SCREEN_HEIGHT (700)
+#define SCREEN_HEIGHT (750)
 
 #define WINDOW_TITLE "Learning some C"
 
