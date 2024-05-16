@@ -54,17 +54,18 @@ int main(void) {
     ClearBackground(GetColor(0x111111));
 
     Vector2 dist = Vector2Subtract(GetMousePosition(), ship.position);
+    dist.y = -200;
 
     ship.rotation = ((-180 / PI) * atan2(dist.y, -dist.x)) + 270;
     ship.position.x += (GetMouseX() - ship.position.x) * 0.1;
 
     draw_ship(&ship);
 
-    // DrawLineV(ship.position, GetMousePosition(), RED);
-    // DrawLineV(ship.position, (struct Vector2){GetMouseX(), ship.position.y},
-    //           RED);
-    // DrawLineV((struct Vector2){GetMouseX(), ship.position.y},
-    //           (struct Vector2){GetMouseX(), GetMouseY()}, RED);
+    DrawLineV(ship.position, GetMousePosition(), RED);
+    DrawLineV(ship.position, (struct Vector2){GetMouseX(), ship.position.y},
+              RED);
+    DrawLineV((struct Vector2){GetMouseX(), ship.position.y},
+              (struct Vector2){GetMouseX(), GetMouseY()}, RED);
 
     snprintf(debug_text, 10 * sizeof(char), "%d FPS", GetFPS());
 

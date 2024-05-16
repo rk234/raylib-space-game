@@ -1,4 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
+set(CMAKE_C_COMPILER /usr/bin/clang)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 project(raylib-hello C)
 set(CMAKE_C_STANDARD 99)
 
