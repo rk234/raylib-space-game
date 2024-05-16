@@ -56,7 +56,7 @@ int main(void) {
     Vector2 dist = Vector2Subtract(GetMousePosition(), ship.position);
 
     ship.rotation = ((-180 / PI) * atan2(dist.y, -dist.x)) + 270;
-    ship.position.x = GetMouseX();
+    ship.position.x += (GetMouseX() - ship.position.x) * 0.1;
 
     draw_ship(&ship);
 
