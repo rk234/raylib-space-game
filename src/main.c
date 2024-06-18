@@ -1,3 +1,4 @@
+#include "entities/ship/ship.h"
 #include "raylib.h"
 #include "raymath.h"
 #include <math.h>
@@ -8,30 +9,6 @@
 #define SCREEN_HEIGHT (750)
 
 #define WINDOW_TITLE "Learning some C"
-
-typedef struct {
-  Vector2 position;
-  float rotation;
-  Texture2D *texture;
-  Color color;
-} Ship;
-
-void draw_ship(Ship *ship) {
-  Rectangle dest = {.x = ship->position.x,
-                    .y = ship->position.y,
-                    .width = ship->texture->width,
-                    .height = ship->texture->height};
-
-  Rectangle src = {.x = 0,
-                   .y = 0,
-                   .width = ship->texture->width,
-                   .height = ship->texture->height};
-
-  Vector2 origin = {.x = dest.width / 2, .y = dest.height / 2};
-
-  DrawTexturePro(*ship->texture, src, dest, origin, ship->rotation,
-                 ship->color);
-}
 
 int main(void) {
   InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW_TITLE);
@@ -61,11 +38,11 @@ int main(void) {
 
     draw_ship(&ship);
 
-    DrawLineV(ship.position, GetMousePosition(), RED);
-    DrawLineV(ship.position, (struct Vector2){GetMouseX(), ship.position.y},
-              RED);
-    DrawLineV((struct Vector2){GetMouseX(), ship.position.y},
-              (struct Vector2){GetMouseX(), GetMouseY()}, RED);
+    // DrawLineV(ship.position, GetMousePosition(), RED);
+    // DrawLineV(ship.position, (struct Vector2){GetMouseX(), ship.position.y},
+    //           RED);
+    // DrawLineV((struct Vector2){GetMouseX(), ship.position.y},
+    //           (struct Vector2){GetMouseX(), GetMouseY()}, RED);
 
     snprintf(debug_text, 10 * sizeof(char), "%d FPS", GetFPS());
 
