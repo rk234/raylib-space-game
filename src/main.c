@@ -1,3 +1,4 @@
+#include "data/blockList.h"
 #include "entities/ship/ship.h"
 #include "raylib.h"
 #include "raymath.h"
@@ -9,6 +10,14 @@
 #define SCREEN_HEIGHT (750)
 
 #define WINDOW_TITLE "Learning some C"
+
+void draw_blocks(BlockList *list) {
+  for (int i = 0; i < list->size; i++) {
+    printf("Height %f\n", block_list_get(list, i)->height);
+  }
+}
+
+int checkCollisions() {}
 
 int main(void) {
   InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW_TITLE);
@@ -24,6 +33,13 @@ int main(void) {
       .color = BLUE};
 
   char *debug_text = (char *)malloc(10 * sizeof(char));
+
+  BlockList *list = create_block_list(2);
+  block_list_add(list, create_block(10.0, 10, 10));
+  block_list_add(list, create_block(4.0, 4, 4));
+  block_list_add(list, create_block(2.0, 2, 2));
+  draw_blocks(list);
+  destroy_block_list(list);
 
   while (!WindowShouldClose()) {
     BeginDrawing();
