@@ -1,10 +1,12 @@
 #include "data/blockList.h"
+#include "entities/block/block.h"
 #include "entities/ship/ship.h"
 #include "raylib.h"
 #include "raymath.h"
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #define SCREEN_WIDTH (500)
 #define SCREEN_HEIGHT (750)
@@ -13,13 +15,26 @@
 
 void draw_blocks(BlockList *list) {
   for (int i = 0; i < list->size; i++) {
-    printf("Height %f\n", block_list_get(list, i)->height);
+    Block *block = block_list_get(list, i);
+    draw_block(block);
+  }
+}
+
+void update_blocks(BlockList *list, float speed, float elapsedTime) {
+  for (int i = 0; i < list->size; i++) {
+    Block *block = block_list_get(list, i);
+    block->height += GetFrameTime() * speed;
+
+    if (block->height > SCREEN_HEIGHT) {
+      block_list_set(list, create_random_block(-100), i);
+    }
   }
 }
 
 int checkCollisions() {}
 
 int main(void) {
+  srand(time(NULL));
   InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW_TITLE);
   SetTargetFPS(60);
 
@@ -35,11 +50,10 @@ int main(void) {
   char *debug_text = (char *)malloc(10 * sizeof(char));
 
   BlockList *list = create_block_list(2);
-  block_list_add(list, create_block(10.0, 10, 10));
-  block_list_add(list, create_block(4.0, 4, 4));
-  block_list_add(list, create_block(2.0, 2, 2));
-  draw_blocks(list);
-  destroy_block_list(list);
+  block_list_add(list, create_random_block(800.0));
+
+  float speed = 100;
+  float elapsedTime = 0;
 
   while (!WindowShouldClose()) {
     BeginDrawing();
@@ -52,10 +66,14 @@ int main(void) {
     ship.rotation = ((-180 / PI) * atan2(dist.y, -dist.x)) + 270;
     ship.position.x += (GetMouseX() - ship.position.x) * 0.1;
 
+    update_blocks(list, speed, elapsedTime);
+
     draw_ship(&ship);
+    draw_blocks(list);
 
     // DrawLineV(ship.position, GetMousePosition(), RED);
-    // DrawLineV(ship.position, (struct Vector2){GetMouseX(), ship.position.y},
+    // DrawLineV(ship.position, (struct Vector2){GetMouseX(),
+    // ship.position.y},
     //           RED);
     // DrawLineV((struct Vector2){GetMouseX(), ship.position.y},
     //           (struct Vector2){GetMouseX(), GetMouseY()}, RED);
@@ -64,6 +82,8 @@ int main(void) {
 
     DrawText(debug_text, 10, 10, 32, PINK);
     EndDrawing();
+
+    elapsedTime += GetFrameTime();
   }
   free(debug_text);
 

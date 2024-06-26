@@ -8,5 +8,7 @@ typedef struct {
 } Block;
 
 Block create_block(float height, float opening_x, float openining_width);
+Block create_random_block(float height);
+void draw_block(Block *block);
 
 #endif // !BLOCK_H_INCLUDED

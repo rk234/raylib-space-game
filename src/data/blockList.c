@@ -26,6 +26,12 @@ Block *block_list_get(BlockList *list, size_t index) {
   return &list->blocks[index];
 }
 
+Block *block_list_set(BlockList *list, Block newBlock, size_t index) {
+  Block *old = block_list_get(list, index);
+  list->blocks[index] = newBlock;
+  return old;
+}
+
 void block_list_resize(BlockList *list, size_t newCapacity) {
   printf("curr capacity: %zu, new cap: %zu\n", sizeof(Block) * list->capacity,
          sizeof(Block) * newCapacity);
