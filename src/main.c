@@ -31,7 +31,7 @@ void update_blocks(BlockList *list, float speed, float elapsedTime) {
   }
 }
 
-int checkCollisions() {}
+int checkCollisions() { return 0; }
 
 int main(void) {
   srand(time(NULL));
