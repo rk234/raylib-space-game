@@ -31,7 +31,7 @@ void update_blocks(BlockList *list, float speed, float elapsedTime) {
   }
 }
 
-int checkCollisions() { return 0; }
+int checkCollisions() {}
 
 int main(void) {
   srand(time(NULL));
@@ -41,11 +41,9 @@ int main(void) {
   Texture2D ship_texture = LoadTexture(
       ASSETS_PATH "ship_G.png"); // Check README.md for how this works
 
-  Ship ship = {
-      .rotation = 0,
-      .position = {.x = (float)SCREEN_WIDTH / 2, .y = SCREEN_HEIGHT - 50},
-      .texture = &ship_texture,
-      .color = BLUE};
+  Vector2 initialShipPos = {.x = (float)SCREEN_WIDTH / 2,
+                            .y = SCREEN_HEIGHT - 50};
+  Ship ship = create_ship(initialShipPos, &ship_texture, BLUE);
 
   char *debug_text = (char *)malloc(10 * sizeof(char));
 
@@ -68,7 +66,9 @@ int main(void) {
 
     update_blocks(list, speed, elapsedTime);
 
+    update_ship(&ship);
     draw_ship(&ship);
+    DrawBoundingBox(ship.bbox, GREEN);
     draw_blocks(list);
 
     // DrawLineV(ship.position, GetMousePosition(), RED);

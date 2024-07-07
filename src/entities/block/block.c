@@ -32,3 +32,17 @@ void draw_block(Block *block) {
   DrawRectangle(block->opening_x + block->opening_width / 2.0,
                 block->height + BLOCK_HEIGHT, GetScreenWidth(), 10, GRAY);
 }
+
+// TODO: finish collision code
+BoundingBox *get_bounding_boxes(Block *block) {
+  BoundingBox *boxes = malloc(sizeof(BoundingBox) * 2);
+  BoundingBox left = {.min = {.x = 0, .y = block->height}, .max = {.x = }};
+  BoundingBox right = {
+
+  };
+
+  boxes[0] = left;
+  boxes[1] = right;
+
+  return boxes;
+}
