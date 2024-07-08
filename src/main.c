@@ -31,7 +31,25 @@ void update_blocks(BlockList *list, float speed, float elapsedTime) {
   }
 }
 
-int checkCollisions() {}
+int check_collisions(Ship *ship, BlockList *list) {
+  BoundingBox bboxes[2];
+  for (int i = 0; i < list->size; i++) {
+    get_bounding_boxes(block_list_get(list, i), &bboxes[0]);
+
+    BoundingBox left = bboxes[0];
+    BoundingBox right = bboxes[1];
+
+    DrawBoundingBox(left, BLUE);
+    DrawBoundingBox(right, BLUE);
+
+    if (CheckCollisionBoxes(ship->bbox, left) ||
+        CheckCollisionBoxes(ship->bbox, right)) {
+      return 1;
+    }
+  }
+
+  return 0;
+}
 
 int main(void) {
   srand(time(NULL));
@@ -49,6 +67,8 @@ int main(void) {
 
   BlockList *list = create_block_list(2);
   block_list_add(list, create_random_block(800.0));
+  block_list_add(list, create_random_block(400.0));
+  block_list_add(list, create_random_block(200.0));
 
   float speed = 100;
   float elapsedTime = 0;
@@ -68,7 +88,11 @@ int main(void) {
 
     update_ship(&ship);
     draw_ship(&ship);
-    DrawBoundingBox(ship.bbox, GREEN);
+    if (check_collisions(&ship, list)) {
+      DrawBoundingBox(ship.bbox, RED);
+    } else {
+      DrawBoundingBox(ship.bbox, GREEN);
+    }
     draw_blocks(list);
 
     // DrawLineV(ship.position, GetMousePosition(), RED);

@@ -11,7 +11,6 @@ typedef struct {
 Block create_block(float height, float opening_x, float openining_width);
 Block create_random_block(float height);
 void draw_block(Block *block);
-BoundingBox *get_bounding_boxes(
-    Block *block); // will always return 2 boxes (for left and right)!
+void get_bounding_boxes(Block *block, BoundingBox *bboxes);
 
 #endif // !BLOCK_H_INCLUDED
