@@ -1,4 +1,5 @@
 #include "data/blockList.h"
+#include "data/gamestate.h"
 #include "entities/block/block.h"
 #include "entities/ship/ship.h"
 #include "raylib.h"
@@ -32,12 +33,13 @@ void update_blocks(BlockList *list, float speed, float elapsedTime) {
 }
 
 int check_collisions(Ship *ship, BlockList *list) {
-  BoundingBox bboxes[2];
+  BoundingBox bboxes[3];
   for (int i = 0; i < list->size; i++) {
     get_bounding_boxes(block_list_get(list, i), &bboxes[0]);
 
     BoundingBox left = bboxes[0];
-    BoundingBox right = bboxes[1];
+    BoundingBox mid = bboxes[1];
+    BoundingBox right = bboxes[2];
 
     DrawBoundingBox(left, BLUE);
     DrawBoundingBox(right, BLUE);
@@ -45,19 +47,30 @@ int check_collisions(Ship *ship, BlockList *list) {
     if (CheckCollisionBoxes(ship->bbox, left) ||
         CheckCollisionBoxes(ship->bbox, right)) {
       return 1;
+    } else if (CheckCollisionBoxes(ship->bbox, mid)) {
+      return 2;
     }
   }
 
   return 0;
 }
 
-int main(void) {
+GameState init_game() {
   srand(time(NULL));
+
+  GameState state = {.score = 0, .shipTexture = NULL};
+
+  return state;
+}
+
+int main(void) {
   InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW_TITLE);
   SetTargetFPS(60);
 
   Texture2D ship_texture = LoadTexture(
       ASSETS_PATH "ship_G.png"); // Check README.md for how this works
+
+  GameState gameState = init_game();
 
   Vector2 initialShipPos = {.x = (float)SCREEN_WIDTH / 2,
                             .y = SCREEN_HEIGHT - 50};
@@ -67,12 +80,11 @@ int main(void) {
 
   BlockList *list = create_block_list(2);
   block_list_add(list, create_random_block(800.0));
-  block_list_add(list, create_random_block(400.0));
-  block_list_add(list, create_random_block(200.0));
 
   float speed = 100;
   float elapsedTime = 0;
 
+  int prevCol = 0;
   while (!WindowShouldClose()) {
     BeginDrawing();
 
@@ -88,11 +100,21 @@ int main(void) {
 
     update_ship(&ship);
     draw_ship(&ship);
-    if (check_collisions(&ship, list)) {
+
+    int col = check_collisions(&ship, list);
+    if (col == 1) { // collided with block
       DrawBoundingBox(ship.bbox, RED);
-    } else {
+    } else if (col == 2) { // passed thru middle!
       DrawBoundingBox(ship.bbox, GREEN);
+    } else {              // no collison
+      if (prevCol == 2) { // increment
+        gameState.score++;
+        printf("SCORE: %i\n", gameState.score);
+      }
+      DrawBoundingBox(ship.bbox, YELLOW);
     }
+
+    prevCol = col;
     draw_blocks(list);
 
     // DrawLineV(ship.position, GetMousePosition(), RED);

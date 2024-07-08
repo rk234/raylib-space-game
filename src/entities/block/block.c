@@ -42,11 +42,16 @@ void get_bounding_boxes(Block *block, BoundingBox *bboxes) {
       .min = {.x = 0, .y = block->height},
       .max = {.x = block->opening_x - block->opening_width / 2.0,
               .y = block->height + BLOCK_HEIGHT}};
+  BoundingBox mid = {.min = {.x = block->opening_x - block->opening_width / 2.0,
+                             .y = block->height},
+                     .max = {.x = block->opening_x + block->opening_width / 2.0,
+                             .y = block->height + BLOCK_HEIGHT}};
   BoundingBox right = {
       .min = {.x = block->opening_x + block->opening_width / 2.0,
               .y = block->height},
       .max = {.x = GetScreenWidth(), .y = block->height + BLOCK_HEIGHT}};
 
   bboxes[0] = left;
-  bboxes[1] = right;
+  bboxes[1] = mid;
+  bboxes[2] = right;
 }
