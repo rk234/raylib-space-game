@@ -42,6 +42,7 @@ int check_collisions(Ship *ship, BlockList *list) {
     BoundingBox right = bboxes[2];
 
     DrawBoundingBox(left, BLUE);
+    DrawBoundingBox(mid, GREEN);
     DrawBoundingBox(right, BLUE);
 
     if (CheckCollisionBoxes(ship->bbox, left) ||
@@ -53,6 +54,13 @@ int check_collisions(Ship *ship, BlockList *list) {
   }
 
   return 0;
+}
+
+void draw_score(GameState *state, int fontSize) {
+  char txt[100];
+  snprintf(&txt[0], 100 * sizeof(char), "%i", state->score);
+  float width = MeasureText(txt, fontSize);
+  DrawText(txt, GetScreenWidth() / 2.0 - (width / 2.0), 30, fontSize, WHITE);
 }
 
 GameState init_game() {
@@ -124,9 +132,9 @@ int main(void) {
     // DrawLineV((struct Vector2){GetMouseX(), ship.position.y},
     //           (struct Vector2){GetMouseX(), GetMouseY()}, RED);
 
-    snprintf(debug_text, 10 * sizeof(char), "%d FPS", GetFPS());
+    DrawFPS(10, 10);
+    draw_score(&gameState, 70);
 
-    DrawText(debug_text, 10, 10, 32, PINK);
     EndDrawing();
 
     elapsedTime += GetFrameTime();
