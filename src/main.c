@@ -71,6 +71,23 @@ GameState init_game() {
   return state;
 }
 
+float calc_speed(int score) {
+  return 100.0f + 500.0f * log(score * (1.0f / 500.0f) + 1);
+}
+
+float get_height_first_blk(BlockList *list) {
+  float high = block_list_get(list, 0)->height;
+
+  for (int i = 0; i < list->size; i++) {
+    Block *b = block_list_get(list, i);
+    if (high > b->height) {
+      high = b->height;
+    }
+  }
+
+  return high;
+}
+
 int main(void) {
   InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW_TITLE);
   SetTargetFPS(60);
@@ -104,22 +121,28 @@ int main(void) {
     ship.rotation = ((-180 / PI) * atan2(dist.y, -dist.x)) + 270;
     ship.position.x += (GetMouseX() - ship.position.x) * 0.1;
 
-    update_blocks(list, speed, elapsedTime);
+    update_blocks(list, calc_speed(gameState.score), elapsedTime);
 
     update_ship(&ship);
     draw_ship(&ship);
 
     int col = check_collisions(&ship, list);
     if (col == 1) { // collided with block
-      DrawBoundingBox(ship.bbox, RED);
+      // DrawBoundingBox(ship.bbox, RED);
+      // TODO: GAME OVER
     } else if (col == 2) { // passed thru middle!
-      DrawBoundingBox(ship.bbox, GREEN);
+      // DrawBoundingBox(ship.bbox, GREEN);
     } else {              // no collison
       if (prevCol == 2) { // increment
         gameState.score++;
+
+        if (gameState.score % 2 == 0 && list->size < 5) {
+          block_list_add(
+              list, create_random_block(get_height_first_blk(list) - 1600));
+        }
         printf("SCORE: %i\n", gameState.score);
       }
-      DrawBoundingBox(ship.bbox, YELLOW);
+      // DrawBoundingBox(ship.bbox, YELLOW);
     }
 
     prevCol = col;
