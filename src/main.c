@@ -41,9 +41,9 @@ int check_collisions(Ship *ship, BlockList *list) {
     BoundingBox mid = bboxes[1];
     BoundingBox right = bboxes[2];
 
-    DrawBoundingBox(left, BLUE);
-    DrawBoundingBox(mid, GREEN);
-    DrawBoundingBox(right, BLUE);
+    // DrawBoundingBox(left, BLUE);
+    // DrawBoundingBox(mid, GREEN);
+    // DrawBoundingBox(right, BLUE);
 
     if (CheckCollisionBoxes(ship->bbox, left) ||
         CheckCollisionBoxes(ship->bbox, right)) {
@@ -66,13 +66,13 @@ void draw_score(GameState *state, int fontSize) {
 GameState init_game() {
   srand(time(NULL));
 
-  GameState state = {.score = 0, .shipTexture = NULL};
+  GameState state = {.score = 0, .shipTexture = NULL, .screen = MAIN_MENU};
 
   return state;
 }
 
 float calc_speed(int score) {
-  return 100.0f + 500.0f * log(score * (1.0f / 500.0f) + 1);
+  return 100.0f + 500.0f * log(score * (1.0f / 10.0f) + 1);
 }
 
 float get_height_first_blk(BlockList *list) {
@@ -86,6 +86,14 @@ float get_height_first_blk(BlockList *list) {
   }
 
   return high;
+}
+
+void handle_input(Ship *ship) {
+  Vector2 dist = Vector2Subtract(GetMousePosition(), ship->position);
+  dist.y = -200;
+
+  ship->rotation = ((-180 / PI) * atan2(dist.y, -dist.x)) + 270;
+  ship->position.x += (GetMouseX() - ship->position.x) * 0.1;
 }
 
 int main(void) {
@@ -115,49 +123,76 @@ int main(void) {
 
     ClearBackground(GetColor(0x111111));
 
-    Vector2 dist = Vector2Subtract(GetMousePosition(), ship.position);
-    dist.y = -200;
+    if (gameState.screen == MAIN_MENU) {
+      const char *titleTxt = "Space Game";
+      float width = MeasureText(titleTxt, 50);
+      DrawText(titleTxt, GetScreenWidth() / 2.0 - (width / 2.0), 30, 50, WHITE);
 
-    ship.rotation = ((-180 / PI) * atan2(dist.y, -dist.x)) + 270;
-    ship.position.x += (GetMouseX() - ship.position.x) * 0.1;
+      const char *startTxt = "Press ENTER to start!";
+      width = MeasureText(startTxt, 30);
+      DrawText(startTxt, GetScreenWidth() / 2.0 - (width / 2.0),
+               GetScreenHeight() - 200, 30, WHITE);
 
-    update_blocks(list, calc_speed(gameState.score), elapsedTime);
-
-    update_ship(&ship);
-    draw_ship(&ship);
-
-    int col = check_collisions(&ship, list);
-    if (col == 1) { // collided with block
-      // DrawBoundingBox(ship.bbox, RED);
-      // TODO: GAME OVER
-    } else if (col == 2) { // passed thru middle!
-      // DrawBoundingBox(ship.bbox, GREEN);
-    } else {              // no collison
-      if (prevCol == 2) { // increment
-        gameState.score++;
-
-        if (gameState.score % 2 == 0 && list->size < 5) {
-          block_list_add(
-              list, create_random_block(get_height_first_blk(list) - 1600));
-        }
-        printf("SCORE: %i\n", gameState.score);
+      if (IsKeyPressed(KEY_ENTER)) {
+        gameState.screen = GAME;
+        gameState.score = 0;
       }
-      // DrawBoundingBox(ship.bbox, YELLOW);
+    } else {
+      if (gameState.screen == GAME) {
+        handle_input(&ship);
+        update_blocks(list, calc_speed(gameState.score), elapsedTime);
+        update_ship(&ship);
+
+        int col = check_collisions(&ship, list);
+        if (col == 1) { // collided with block
+          gameState.screen = GAME_OVER;
+        } else if (col == 2) { // passed thru middle!
+          // DrawBoundingBox(ship.bbox, GREEN);
+        } else {              // no collison
+          if (prevCol == 2) { // increment
+            gameState.score++;
+            printf("SCORE: %i\n", gameState.score);
+          }
+          // DrawBoundingBox(ship.bbox, YELLOW);
+        }
+
+        prevCol = col;
+      }
+
+      draw_blocks(list);
+      draw_ship(&ship);
+
+      if (gameState.screen == GAME_OVER) {
+        const char *titleTxt = "Game Over";
+        float width = MeasureText(titleTxt, 50);
+        DrawText(titleTxt, GetScreenWidth() / 2.0 - (width / 2.0), 100, 50,
+                 WHITE);
+
+        const char *startTxt = "Press ENTER to play again!";
+        width = MeasureText(startTxt, 30);
+        DrawText(startTxt, GetScreenWidth() / 2.0 - (width / 2.0),
+                 GetScreenHeight() - 200, 30, WHITE);
+
+        if (IsKeyPressed(KEY_ENTER)) {
+          gameState.screen = GAME;
+          gameState.score = 0;
+          destroy_block_list(list);
+          list = create_block_list(2);
+          block_list_add(list, create_random_block(800.0));
+        }
+      }
+
+      // DrawLineV(ship.position, GetMousePosition(), RED);
+      // DrawLineV(ship.position, (struct Vector2){GetMouseX(),
+      // ship.position.y},
+      //           RED);
+      // DrawLineV((struct Vector2){GetMouseX(), ship.position.y},
+      //           (struct Vector2){GetMouseX(), GetMouseY()}, RED);
+
+      draw_score(&gameState, 70);
     }
 
-    prevCol = col;
-    draw_blocks(list);
-
-    // DrawLineV(ship.position, GetMousePosition(), RED);
-    // DrawLineV(ship.position, (struct Vector2){GetMouseX(),
-    // ship.position.y},
-    //           RED);
-    // DrawLineV((struct Vector2){GetMouseX(), ship.position.y},
-    //           (struct Vector2){GetMouseX(), GetMouseY()}, RED);
-
     DrawFPS(10, 10);
-    draw_score(&gameState, 70);
-
     EndDrawing();
 
     elapsedTime += GetFrameTime();
