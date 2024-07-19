@@ -1,4 +1,4 @@
-Basic endless scrolling game built with raylib to get familiar with C.
+Basic endless scrolling game built with raylib to get familiar with C. Assets from [Kenney's Simple Space](https://kenney.nl/assets/simple-space).
 
 ## Building
 
