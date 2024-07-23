@@ -1,5 +1,9 @@
 Basic endless scrolling game built with raylib to get familiar with C. Assets from [Kenney's Simple Space](https://kenney.nl/assets/simple-space).
 
+TODO:
+- [ ] Make the number of blocks increase with difficulty (array-list like functionality already implemented)
+- [ ] Use raygui for UI
+
 ## Building
 
 Uses CMake build system and clang compiler.
